@@ -8,15 +8,24 @@ A beautiful macOS application that converts Markdown files to professionally sty
 
 ## Features
 
-✨ **Beautiful PDF Output**
-- Professional typography with Inter and JetBrains Mono fonts
-- Syntax highlighted code blocks
-- GitHub-style alerts (NOTE, TIP, IMPORTANT, WARNING, CAUTION)
-- Responsive tables with alternating row colors
-- Clean, modern design matching Antigravity's aesthetics
+- **Beautiful PDFs**: Antigravity-style design with modern typography
+- **GitHub Flavored Markdown**: Full GFM support including tables, alerts, task lists
+- **Mermaid Diagrams**: Renders flowcharts, Gantt charts, and other diagrams
+- **Syntax Highlighting**: Code blocks with Pygments highlighting
+- **Drag & Drop GUI**: Easy-to-use interface with live preview
+- **Command Line**: Programmatic conversion support
 
-🎨 **Modern GUI**
-- Drag & drop support for markdown files
+## Known Issues
+
+⚠️ **GUI .app bundle has stability issues** - The standalone .app may crash when clicking. 
+
+**Workaround:** Use the command line interface instead:
+```bash
+conda activate mdtopdf-env
+python -c "from src.converter import convert_file; convert_file('input.md', 'output.pdf')"
+```
+
+This works perfectly and is more reliable for batch processing. for markdown files
 - Live split-view preview (markdown source + styled HTML)
 - Clean, native macOS interface
 - Progress indication during conversion
