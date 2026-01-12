@@ -72,15 +72,20 @@ class DropWidget(QWidget):
     
     def mousePressEvent(self, event):
         """Handle click to open file dialog"""
-        if event.button() == Qt.MouseButton.LeftButton:
-            file_path, _ = QFileDialog.getOpenFileName(
-                self,
-                "Select Markdown File",
-                "",
-                "Markdown Files (*.md *.markdown);;All Files (*.*)"
-            )
-            if file_path:
-                self.file_dropped.emit(file_path)
+        try:
+            if event.button() == Qt.MouseButton.LeftButton:
+                file_path, _ = QFileDialog.getOpenFileName(
+                    self,
+                    "Select Markdown File",
+                    "",
+                    "Markdown Files (*.md *.markdown);;All Files (*.*)"
+                )
+                if file_path:
+                    self.file_dropped.emit(file_path)
+        except Exception as e:
+            print(f"Error in mousePressEvent: {e}")
+            import traceback
+            traceback.print_exc()
     
     def dragEnterEvent(self, event: QDragEnterEvent):
         """Handle drag enter event"""
@@ -372,6 +377,15 @@ class MainWindow(QMainWindow):
 
 def main():
     """Application entry point"""
+    # Set up global exception handler to prevent crashes
+    def exception_handler(exc_type, exc_value, exc_traceback):
+        """Handle uncaught exceptions"""
+        import traceback
+        print("Uncaught exception:", exc_type, exc_value)
+        traceback.print_exception(exc_type, exc_value, exc_traceback)
+    
+    sys.excepthook = exception_handler
+    
     app = QApplication(sys.argv)
     app.setApplicationName("MD to PDF Converter")
     app.setOrganizationName("Antigravity")
