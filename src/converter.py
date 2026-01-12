@@ -69,6 +69,27 @@ class MarkdownConverter:
             }
         )
     
+    
+    def _process_mermaid_diagrams(self, markdown_text):
+        """
+        Process mermaid code blocks and convert them to mermaid div elements
+        
+        Args:
+            markdown_text: Raw markdown text
+            
+        Returns:
+            Processed markdown with mermaid divs
+        """
+        # Pattern to match mermaid code blocks
+        mermaid_pattern = r'```mermaid\s*\n(.*?)\n```'
+        
+        def replace_mermaid(match):
+            mermaid_code = match.group(1)
+            # Convert to a div that mermaid.js will render
+            return f'<div class="mermaid">\n{mermaid_code}\n</div>\n'
+        
+        return re.sub(mermaid_pattern, replace_mermaid, markdown_text, flags=re.DOTALL)
+    
     def _process_github_alerts(self, markdown_text):
         """
         Process GitHub-style alerts like > [!NOTE]
@@ -137,8 +158,11 @@ class MarkdownConverter:
         Returns:
             HTML string
         """
-        # Process GitHub-style alerts first
-        processed_md = self._process_github_alerts(markdown_text)
+        # Process mermaid diagrams first (before markdown conversion)
+        processed_md = self._process_mermaid_diagrams(markdown_text)
+        
+        # Process GitHub-style alerts
+        processed_md = self._process_github_alerts(processed_md)
         
         # Convert to HTML
         html = self.md.convert(processed_md)
