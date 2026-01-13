@@ -16,26 +16,6 @@ from PyQt6.QtWebEngineWidgets import QWebEngineView
 from .converter import MarkdownConverter
 
 
-class ConversionThread(QThread):
-    """Background thread for PDF conversion"""
-    finished = pyqtSignal(str)
-    error = pyqtSignal(str)
-    
-    def __init__(self, input_file, output_file, theme='antigravity'):
-        super().__init__()
-        self.input_file = input_file
-        self.output_file = output_file
-        self.theme = theme
-    
-    def run(self):
-        try:
-            converter = MarkdownConverter(theme=self.theme)
-            converter.markdown_file_to_pdf(self.input_file, self.output_file)
-            self.finished.emit(self.output_file)
-        except Exception as e:
-            self.error.emit(str(e))
-
-
 class DropWidget(QWidget):
     """Widget that accepts drag and drop of markdown files"""
     file_dropped = pyqtSignal(str)
@@ -344,19 +324,27 @@ class MainWindow(QMainWindow):
         if not output_path:
             return
         
-        # Start conversion in background thread
+        # Show progress and disable button
         self.progress_bar.setVisible(True)
         self.progress_bar.setRange(0, 0)  # Indeterminate progress
         self.convert_btn.setEnabled(False)
         self.status_bar.showMessage("Converting...")
         
-        self.conversion_thread = ConversionThread(
-            self.current_file,
-            output_path
-        )
-        self.conversion_thread.finished.connect(self.on_conversion_finished)
-        self.conversion_thread.error.connect(self.on_conversion_error)
-        self.conversion_thread.start()
+        # Store output path for later
+        self.output_path = output_path
+        
+        # Use QTimer to do conversion after UI updates
+        from PyQt6.QtCore import QTimer
+        QTimer.singleShot(100, self.do_conversion)
+    
+    def do_conversion(self):
+        """Actually perform the conversion (in main thread)"""
+        try:
+            converter = MarkdownConverter()
+            converter.markdown_file_to_pdf(self.current_file, self.output_path)
+            self.on_conversion_finished(self.output_path)
+        except Exception as e:
+            self.on_conversion_error(str(e))
     
     def on_conversion_finished(self, output_path):
         """Handle successful conversion"""
