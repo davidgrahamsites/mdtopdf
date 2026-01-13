@@ -204,8 +204,29 @@ class MainWindow(QMainWindow):
         right_label.setStyleSheet("font-weight: bold; font-size: 14px; color: #1a1a1a;")
         right_layout.addWidget(right_label)
         
+        # Create container for page-like appearance
+        preview_container = QWidget()
+        preview_container.setStyleSheet("""
+            QWidget {
+                background: #e9ecef;
+                padding: 20px;
+            }
+        """)
+        preview_container_layout = QVBoxLayout()
+        preview_container.setLayout(preview_container_layout)
+        
         self.html_preview = QWebEngineView()
-        right_layout.addWidget(self.html_preview)
+        self.html_preview.setStyleSheet("""
+            QWebEngineView {
+                background: white;
+                border: 2px solid #dee2e6;
+                border-radius: 4px;
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            }
+        """)
+        preview_container_layout.addWidget(self.html_preview)
+        
+        right_layout.addWidget(preview_container)
         
         self.splitter.addWidget(left_panel)
         self.splitter.addWidget(right_panel)
