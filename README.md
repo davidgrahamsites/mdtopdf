@@ -15,29 +15,6 @@ A beautiful macOS application that converts Markdown files to professionally sty
 - **Drag & Drop GUI**: Easy-to-use interface with live preview
 - **Command Line**: Programmatic conversion support
 
-## Known Issues
-
-⚠️ **GUI .app bundle has stability issues** - The standalone .app may crash when clicking. 
-
-**Workaround:** Use the command line interface instead:
-```bash
-conda activate mdtopdf-env
-python -c "from src.converter import convert_file; convert_file('input.md', 'output.pdf')"
-```
-
-This works perfectly and is more reliable for batch processing. for markdown files
-- Live split-view preview (markdown source + styled HTML)
-- Clean, native macOS interface
-- Progress indication during conversion
-
-📦 **Comprehensive Markdown Support**
-- GitHub Flavored Markdown
-- Fenced code blocks with syntax highlighting
-- Tables
-- Task lists
-- Emoji support
-- And much more!
-
 ## Installation
 
 ### Prerequisites
