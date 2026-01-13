@@ -204,6 +204,7 @@ class MarkdownConverter:
         page_layout.setPageSize(QPageSize(QPageSize.PageSizeId.A4))
         page_layout.setOrientation(QPageLayout.Orientation.Portrait)
         page_layout.setUnits(QPageLayout.Unit.Millimeter)
+        print(f"Setting PDF margins to: {margin_mm}mm")  # Debug
         page_layout.setMargins(QMarginsF(margin_mm, margin_mm, margin_mm, margin_mm))
         printer.setPageLayout(page_layout)
         

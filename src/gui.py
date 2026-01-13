@@ -411,6 +411,7 @@ class MainWindow(QMainWindow):
         try:
             # Get margin value from slider
             margin_mm = self.margin_slider.value()
+            print(f"DEBUG: Converting with margin={margin_mm}mm")
             
             converter = MarkdownConverter()
             converter.markdown_file_to_pdf(self.current_file, self.output_path, margin_mm)
