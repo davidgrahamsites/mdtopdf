@@ -8,7 +8,7 @@ from pathlib import Path
 from PyQt6.QtWidgets import (
     QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout,
     QPushButton, QLabel, QFileDialog, QSplitter, QTextEdit, QMessageBox,
-    QProgressBar, QMenuBar, QMenu, QStatusBar
+    QProgressBar, QMenuBar, QMenu, QStatusBar, QSlider
 )
 from PyQt6.QtCore import Qt, QThread, pyqtSignal, QMimeData, QUrl
 from PyQt6.QtGui import QDragEnterEvent, QDropEvent, QAction, QFont
@@ -213,6 +213,32 @@ class MainWindow(QMainWindow):
         
         main_layout.addWidget(self.splitter)
         
+        # Margin control
+        margin_panel = QWidget()
+        margin_panel.setVisible(False)
+        margin_layout = QHBoxLayout()
+        margin_panel.setLayout(margin_layout)
+        
+        margin_label = QLabel("📏 PDF Margins:")
+        margin_label.setStyleSheet("font-weight: 500; font-size: 13px; color: #1a1a1a;")
+        margin_layout.addWidget(margin_label)
+        
+        self.margin_slider = QSlider(Qt.Orientation.Horizontal)
+        self.margin_slider.setMinimum(10)  # 10mm
+        self.margin_slider.setMaximum(50)  # 50mm
+        self.margin_slider.setValue(25)    # 25mm default
+        self.margin_slider.setTickPosition(QSlider.TickPosition.TicksBelow)
+        self.margin_slider.setTickInterval(10)
+        self.margin_slider.valueChanged.connect(self.on_margin_changed)
+        margin_layout.addWidget(self.margin_slider)
+        
+        self.margin_value_label = QLabel("25mm")
+        self.margin_value_label.setStyleSheet("font-weight: bold; color: #0969da; min-width: 50px;")
+        margin_layout.addWidget(self.margin_value_label)
+        
+        self.margin_panel = margin_panel
+        main_layout.addWidget(margin_panel)
+        
         # Buttons
         button_layout = QHBoxLayout()
         
@@ -298,6 +324,7 @@ class MainWindow(QMainWindow):
             # Show preview panels
             self.drop_widget.setVisible(False)
             self.splitter.setVisible(True)
+            self.margin_panel.setVisible(True)
             self.convert_btn.setEnabled(True)
             
             # Update status
@@ -305,6 +332,27 @@ class MainWindow(QMainWindow):
             
         except Exception as e:
             QMessageBox.critical(self, "Error", f"Failed to load file:\n{str(e)}")
+    
+    def on_margin_changed(self, value):
+        """Handle margin slider changes"""
+        # Update label
+        self.margin_value_label.setText(f"{value}mm")
+        
+        # Update preview with new margins
+        if self.current_markdown:
+            html = self.converter.markdown_to_html(self.current_markdown)
+            from .styles import get_css
+            # Add CSS with updated body padding
+            styled_html = f"""
+            <style>
+            {get_css()}
+            body {{
+                padding: {value}mm !important;
+            }}
+            </style>
+            {html}
+            """
+            self.html_preview.setHtml(styled_html)
     
     def convert_to_pdf(self):
         """Convert the current markdown to PDF"""
@@ -340,8 +388,11 @@ class MainWindow(QMainWindow):
     def do_conversion(self):
         """Actually perform the conversion (in main thread)"""
         try:
+            # Get margin value from slider
+            margin_mm = self.margin_slider.value()
+            
             converter = MarkdownConverter()
-            converter.markdown_file_to_pdf(self.current_file, self.output_path)
+            converter.markdown_file_to_pdf(self.current_file, self.output_path, margin_mm)
             self.on_conversion_finished(self.output_path)
         except Exception as e:
             self.on_conversion_error(str(e))

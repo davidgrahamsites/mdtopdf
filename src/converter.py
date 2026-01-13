@@ -170,13 +170,14 @@ class MarkdownConverter:
         # Wrap in complete HTML document
         return self._wrap_html(html)
     
-    def markdown_to_pdf(self, markdown_text, output_path):
+    def markdown_to_pdf(self, markdown_text, output_path, margin_mm=25):
         """
         Convert markdown text to PDF using PyQt6's PDF printer
         
         Args:
             markdown_text: Raw markdown content
             output_path: Path to save the PDF
+            margin_mm: Margin size in millimeters (default: 25)
         """
         # Ensure QApplication exists
         app = QApplication.instance()
@@ -203,7 +204,7 @@ class MarkdownConverter:
         page_layout.setPageSize(QPageSize(QPageSize.PageSizeId.A4))
         page_layout.setOrientation(QPageLayout.Orientation.Portrait)
         page_layout.setUnits(QPageLayout.Unit.Millimeter)
-        page_layout.setMargins(QMarginsF(25, 25, 25, 25))
+        page_layout.setMargins(QMarginsF(margin_mm, margin_mm, margin_mm, margin_mm))
         printer.setPageLayout(page_layout)
         
         # Function to handle PDF printing after page load
@@ -235,18 +236,19 @@ class MarkdownConverter:
         # Process events to allow loading
         app.exec()
     
-    def markdown_file_to_pdf(self, input_file, output_file):
+    def markdown_file_to_pdf(self, input_file, output_file, margin_mm=25):
         """
         Convert a markdown file to PDF
         
         Args:
             input_file: Path to input .md file
             output_file: Path to output .pdf file
+            margin_mm: Margin size in millimeters (default: 25)
         """
         with open(input_file, 'r', encoding='utf-8') as f:
             markdown_text = f.read()
         
-        self.markdown_to_pdf(markdown_text, output_file)
+        self.markdown_to_pdf(markdown_text, output_file, margin_mm)
         return output_file
 
 
