@@ -48,44 +48,69 @@ class DropWidget(QWidget):
     def setup_ui(self):
         layout = QVBoxLayout()
         
-        # Drop zone label
-        self.drop_label = QLabel("📄\n\nDrag & Drop Markdown File Here\nor Click to Browse")
-        self.drop_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self.drop_label.setStyleSheet("""
-            QLabel {
+        # Create a container widget for the drop zone
+        self.drop_container = QWidget()
+        self.drop_container.setStyleSheet("""
+            QWidget {
                 border: 3px dashed #0969da;
                 border-radius: 12px;
-                padding: 60px;
-                font-size: 16px;
-                color: #6c757d;
                 background: #f8f9fa;
             }
-            QLabel:hover {
+            QWidget:hover {
                 background: #e9ecef;
                 border-color: #0550ae;
             }
         """)
-        self.drop_label.setMinimumHeight(200)
+        self.drop_container.setMinimumHeight(200)
         
-        layout.addWidget(self.drop_label)
+        container_layout = QVBoxLayout()
+        self.drop_container.setLayout(container_layout)
+        
+        # Icon label
+        icon_label = QLabel("📄")
+        icon_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        icon_label.setStyleSheet("font-size: 48px; border: none; background: transparent;")
+        container_layout.addWidget(icon_label)
+        
+        # Text label
+        text_label = QLabel("Drag & Drop Markdown File Here")
+        text_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        text_label.setStyleSheet("font-size: 16px; color: #6c757d; border: none; background: transparent;")
+        container_layout.addWidget(text_label)
+        
+        # Browse button
+        self.browse_btn = QPushButton("📁 Click to Browse")
+        self.browse_btn.clicked.connect(self.open_file_dialog)
+        self.browse_btn.setStyleSheet("""
+            QPushButton {
+                background: #0969da;
+                color: white;
+                border: none;
+                border-radius: 6px;
+                padding: 12px 24px;
+                font-size: 14px;
+                font-weight: 500;
+                margin: 10px 40px;
+            }
+            QPushButton:hover {
+                background: #0550ae;
+            }
+        """)
+        container_layout.addWidget(self.browse_btn)
+        
+        layout.addWidget(self.drop_container)
         self.setLayout(layout)
     
-    def mousePressEvent(self, event):
-        """Handle click to open file dialog"""
-        try:
-            if event.button() == Qt.MouseButton.LeftButton:
-                file_path, _ = QFileDialog.getOpenFileName(
-                    self,
-                    "Select Markdown File",
-                    "",
-                    "Markdown Files (*.md *.markdown);;All Files (*.*)"
-                )
-                if file_path:
-                    self.file_dropped.emit(file_path)
-        except Exception as e:
-            print(f"Error in mousePressEvent: {e}")
-            import traceback
-            traceback.print_exc()
+    def open_file_dialog(self):
+        """Open file selection dialog"""
+        file_path, _ = QFileDialog.getOpenFileName(
+            self,
+            "Select Markdown File",
+            "",
+            "Markdown Files (*.md *.markdown);;All Files (*.*)"
+        )
+        if file_path:
+            self.file_dropped.emit(file_path)
     
     def dragEnterEvent(self, event: QDragEnterEvent):
         """Handle drag enter event"""
