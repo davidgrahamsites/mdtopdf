@@ -224,7 +224,8 @@ class MarkdownConverter:
                 # Wait for mermaid diagrams to render (JavaScript needs time)
                 from PyQt6.QtCore import QTimer
                 def print_after_render():
-                    web_view.page().printToPdf(on_pdf_written)
+                    # CRITICAL FIX: Pass page_layout to printToPdf so margins are used
+                    web_view.page().printToPdf(on_pdf_written, page_layout)
                 
                 # Wait 2 seconds for mermaid to render diagrams
                 QTimer.singleShot(2000, print_after_render)
