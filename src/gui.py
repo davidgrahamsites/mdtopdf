@@ -479,6 +479,14 @@ def main():
     window = MainWindow()
     window.show()
     
+    # Handle file passed via "Open With..." or command line
+    if len(sys.argv) > 1:
+        file_path = sys.argv[1]
+        if os.path.isfile(file_path) and file_path.endswith(('.md', '.markdown', '.mdown', '.mkd', '.txt')):
+            # Use QTimer to load file after event loop starts
+            from PyQt6.QtCore import QTimer
+            QTimer.singleShot(100, lambda: window.load_file(file_path))
+    
     sys.exit(app.exec())
 
 
